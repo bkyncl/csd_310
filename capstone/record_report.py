@@ -14,8 +14,8 @@ def averageAssets(cursor):
 
     h1=[["Displaying the average asset possession for clients"]]
     h2=["Total Accounts", "AVG Asset Possesion"]
-    print(tabulate(h1,tablefmt="fancy_grid"))
-    print(tabulate(selection, headers=h2, tablefmt="fancy_grid"))
+    print(tabulate(h1,tablefmt="rounded_grid"))
+    print(tabulate(selection, headers=h2, tablefmt="orgtbl"))
     
  
 # Display all clients and their total assets
@@ -26,10 +26,10 @@ def assetAccounts(cursor):
                     "INNER JOIN assets a ON b.client_id = a.client_id GROUP BY client_id")
     clients = cursor.fetchall()
 
-    h1=[["Displaying total fees paid for each client\nCompared to current asset possession"]]
+    h1=[["Displaying total fees paid by each client\nCompared to current asset possession"]]
     h2=["Client ID","Total Fees Paid","Assets"]
-    print(tabulate(h1,tablefmt="fancy_grid"))
-    print(tabulate(clients, headers=h2, tablefmt="fancy_grid"))
+    print(tabulate(h1,tablefmt="rounded_grid"))
+    print(tabulate(clients, headers=h2, tablefmt="orgtbl"))
     
 
 #Display the amount of new clients in the last x months.
@@ -43,8 +43,8 @@ def monthlyNewUsers(cursor, months):
 
     h1=[["How many clients have been added within the last 6 months?"]]
     h2=["Account(s)","Start Date","End Date"]
-    print(tabulate(h1,tablefmt="fancy_grid"))
-    print(tabulate(selection, headers=h2, tablefmt="fancy_grid"))
+    print(tabulate(h1,tablefmt="rounded_grid"))
+    print(tabulate(selection, headers=h2, tablefmt="orgtbl"))
 
 
 # Display total number of clients added in each 6 mnth period since first client initialization date
@@ -69,8 +69,8 @@ def acquisitionRate(cursor):
 
     h1=[["Displaying new client acquisition(s) every 6 months\nStarting as first account initialization date"]]
     h2=["New Client(s)","Start Date","End Date"]
-    print(tabulate(h1,tablefmt="fancy_grid"))
-    print(tabulate(client_dates, headers=h2, tablefmt="fancy_grid"))
+    print(tabulate(h1,tablefmt="rounded_grid"))
+    print(tabulate(client_dates, headers=h2, tablefmt="orgtbl"))
 
 # display transaction activity per month
 def transactionsPerMonth(cursor):
@@ -84,8 +84,8 @@ def transactionsPerMonth(cursor):
 
     h1=[["Displaying transaction activity per month\nCompared to previous months activity"]]
     h2=["Month","Count","Prev. Count","% Increase/Decrease"]
-    print(tabulate(h1,tablefmt="fancy_grid"))
-    print(tabulate(transactions, headers=h2, tablefmt="fancy_grid"))
+    print(tabulate(h1,tablefmt="rounded_grid"))
+    print(tabulate(transactions, headers=h2, tablefmt="orgtbl"))
     
 
 # display transaction activity per year
@@ -98,8 +98,8 @@ def transactionsPerYear(cursor):
 
     h1=[["Displaying transaction activity per year\nCompared to previous years activity"]]
     h2=["Year","Count","Prev. Count","% Increase/Decrease"]
-    print(tabulate(h1,tablefmt="fancy_grid"))
-    print(tabulate(transactions, headers=h2, tablefmt="fancy_grid"))
+    print(tabulate(h1,tablefmt="rounded_grid"))
+    print(tabulate(transactions, headers=h2, tablefmt="orgtbl"))
     
 
 def monthlyFeeRevenue(cursor):
@@ -111,8 +111,8 @@ def monthlyFeeRevenue(cursor):
 
     h1=[["Displaying total transaction fee revenue per month"]]
     h2=["Month","Fee Revenue","% Increase/Decrease"]
-    print(tabulate(h1,tablefmt="fancy_grid"))
-    print(tabulate(fees, headers=h2, tablefmt="fancy_grid"))
+    print(tabulate(h1,tablefmt="rounded_grid"))
+    print(tabulate(fees, headers=h2, tablefmt="orgtbl"))
 
     count = 0
     rev = 0
@@ -120,7 +120,7 @@ def monthlyFeeRevenue(cursor):
         count += 1
         rev += fee[1]
     h3=[[f"Monthly Fee Revenue AVG: ${rev/count:.2f}"]]
-    print(tabulate(h3,tablefmt="fancy_grid"))
+    print(tabulate(h3,tablefmt="orgtbl"))
 
 
 def yearlyFeeRevenue(cursor):
@@ -131,8 +131,8 @@ def yearlyFeeRevenue(cursor):
 
     h1=[["Displaying total transaction fee revenue per year"]]
     h2=["Year","Fee Revenue","% Increase/Decrease"]
-    print(tabulate(h1,tablefmt="fancy_grid"))
-    print(tabulate(fees, headers=h2, tablefmt="fancy_grid"))
+    print(tabulate(h1,tablefmt="rounded_grid"))
+    print(tabulate(fees, headers=h2, tablefmt="orgtbl"))
 
     count = 0
     rev = 0
@@ -140,7 +140,7 @@ def yearlyFeeRevenue(cursor):
         count += 1
         rev += fee[1]
     h3=[[f"Yearly Fee Revenue AVG: ${rev/count:.2f}"]]
-    print(tabulate(h3,tablefmt="fancy_grid"))
+    print(tabulate(h3,tablefmt="orgtbl"))
 
 
 #Display how many clients have had over x amount of transactions in a month
@@ -151,13 +151,13 @@ def userTransactions(cursor, transactions):
     for i in selection:
         x += i[1]
     h1=[[f"How many clients have a high number of transactions per month?\n{x} clients have had at most {transactions} transactions in a month"]]
-    print(tabulate(h1,tablefmt="fancy_grid"))
+    print(tabulate(h1,tablefmt="rounded_grid"))
 
     cursor.execute("SELECT client_id, COUNT(*) as count, DATE_FORMAT(transaction_date, '%Y-%m') AS Date FROM transactions "+
                     "GROUP BY client_id, month(transaction_date), year(transaction_date) HAVING COUNT(*) >= 2")
     users = cursor.fetchall()
     h2=["Client ID","Count","Date"]
-    print(tabulate(users,h2,tablefmt="fancy_grid"))
+    print(tabulate(users,h2,tablefmt="orgtbl"))
 
 config = {
     "user": "financial_user",
@@ -180,6 +180,7 @@ try:
     print("Report 1")
     print("-----------------------------------------------------------------")
     averageAssets(myCursor)
+    print()
     assetAccounts(myCursor)
 
     #Displaying transaction acticity
@@ -187,7 +188,9 @@ try:
     print("Report 2")
     print("-----------------------------------------------------------------")
     userTransactions(myCursor,2)
+    print()
     transactionsPerMonth(myCursor)
+    print()
     transactionsPerYear(myCursor)
     
     #Number of clients added in each 6 month period since first account initialization date
@@ -195,6 +198,7 @@ try:
     print("Report 3")
     print("-----------------------------------------------------------------")
     monthlyNewUsers(myCursor, 6)
+    print()
     acquisitionRate(myCursor)
     
     #Displaying fee revenue monthly and yearly trends
@@ -202,6 +206,7 @@ try:
     print("Report 4")
     print("-----------------------------------------------------------------")
     monthlyFeeRevenue(myCursor)
+    print()
     yearlyFeeRevenue(myCursor)
 
     print()
@@ -215,6 +220,3 @@ except mysql.connector.Error as err:
         print(err)
 finally:
     db.close()
-
-
-
